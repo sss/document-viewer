@@ -11,7 +11,12 @@ include $(CLEAR_VARS)
 
 MY_ROOT := $(LOCAL_PATH)/mupdf
 
-LOCAL_CFLAGS += -Wall
+LOCAL_CFLAGS := \
+	-Wall \
+	-ffunction-sections -fdata-sections \
+	-D_FILE_OFFSET_BITS=32 \
+	-DAA_BITS=8 \
+
 LOCAL_CFLAGS += -DTOFU_CJK_LANG
 LOCAL_CFLAGS += -DTOFU_CJK_EXT
 LOCAL_CFLAGS += -DTOFU_NOTO
@@ -25,7 +30,6 @@ endif
 ifdef SUPPORT_GPROOF
 LOCAL_CFLAGS += -DSUPPORT_GPROOF
 endif
-LOCAL_CFLAGS += -DAA_BITS=8
 ifdef MEMENTO
 LOCAL_CFLAGS += -DMEMENTO -DMEMENTO_LEAKONLY
 endif
@@ -34,26 +38,18 @@ LOCAL_CFLAGS += -DHAVE_OPENSSL
 endif
 
 LOCAL_C_INCLUDES := \
-	$(MY_ROOT)/thirdparty/harfbuzz/src \
-	$(MY_ROOT)/thirdparty/jbig2dec \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2 \
-	$(MY_ROOT)/thirdparty/libjpeg \
-	$(MY_ROOT)/thirdparty/mujs \
-	$(MY_ROOT)/thirdparty/zlib \
-	$(MY_ROOT)/thirdparty/freetype/include \
-	$(MY_ROOT)/source/fitz \
-	$(MY_ROOT)/source/pdf \
-	$(MY_ROOT)/source/xps \
-	$(MY_ROOT)/source/svg \
-	$(MY_ROOT)/source/cbz \
-	$(MY_ROOT)/source/img \
-	$(MY_ROOT)/source/tiff \
+	$(MY_ROOT)/include \
 	$(MY_ROOT)/scripts/freetype \
 	$(MY_ROOT)/scripts/libjpeg \
-	$(MY_ROOT)/generated \
-	$(MY_ROOT)/resources \
-	$(MY_ROOT)/include \
-	$(MY_ROOT)
+	$(MY_ROOT)/thirdparty/freetype/include \
+	$(MY_ROOT)/thirdparty/harfbuzz/src \
+	$(MY_ROOT)/thirdparty/jbig2dec \
+	$(MY_ROOT)/thirdparty/libjpeg \
+	$(MY_ROOT)/thirdparty/lcms2/include \
+	$(MY_ROOT)/thirdparty/mujs \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2 \
+	$(MY_ROOT)/thirdparty/zlib \
+
 ifdef V8_BUILD
 LOCAL_C_INCLUDES += $(MY_ROOT)/thirdparty/$(V8)/include
 endif
@@ -63,22 +59,22 @@ endif
 
 LOCAL_MODULE    := mupdfcore
 LOCAL_SRC_FILES := \
-	$(subst $(LOCAL_PATH)/,, \
-		$(wildcard $(MY_ROOT)/source/fitz/*.c) \
-		$(wildcard $(MY_ROOT)/source/pdf/*.c) \
-		$(wildcard $(MY_ROOT)/source/xps/*.c) \
-		$(wildcard $(MY_ROOT)/source/svg/*.c) \
-		$(wildcard $(MY_ROOT)/source/cbz/*.c) \
-		$(wildcard $(MY_ROOT)/source/gprf/*.c) \
-		$(wildcard $(MY_ROOT)/source/html/*.c) \
-		$(wildcard $(MY_ROOT)/generated/*.c) \
-	)
+     $(wildcard $(MY_ROOT)/source/fitz/*.c) \
+     $(wildcard $(MY_ROOT)/source/pdf/*.c) \
+     $(wildcard $(MY_ROOT)/source/xps/*.c) \
+     $(wildcard $(MY_ROOT)/source/svg/*.c) \
+     $(wildcard $(MY_ROOT)/source/cbz/*.c) \
+     $(wildcard $(MY_ROOT)/source/gprf/*.c) \
+     $(wildcard $(MY_ROOT)/source/html/*.c) \
+     $(wildcard $(MY_ROOT)/generated/*.c) \
 
 ifdef SUPPORT_GPROOF
 LOCAL_SHARED_LIBRARIES := gsso
 endif
-LOCAL_LDLIBS    := -lm -llog -ljnigraphics
 
-#LOCAL_SRC_FILES := $(addprefix ../, $(LOCAL_SRC_FILES))
+LOCAL_SRC_FILES := \
+	$(subst $(LOCAL_PATH)/,, \
+		$(LOCAL_SRC_FILES) \
+	)
 
 include $(BUILD_STATIC_LIBRARY)

@@ -4,26 +4,31 @@ include $(CLEAR_VARS)
 
 MY_ROOT := $(LOCAL_PATH)/mupdf
 
+LOCAL_MODULE := mupdfthirdparty
+
+LOCAL_CPP_EXTENSION := .cc
+
 LOCAL_C_INCLUDES := \
-	$(MY_ROOT)/include/ \
+	$(MY_ROOT)/include \
+	$(MY_ROOT)/scripts/freetype \
+	$(MY_ROOT)/scripts/libjpeg \
+	$(MY_ROOT)/thirdparty/freetype/include \
 	$(MY_ROOT)/thirdparty/harfbuzz/src \
 	$(MY_ROOT)/thirdparty/jbig2dec \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2 \
 	$(MY_ROOT)/thirdparty/libjpeg \
+	$(MY_ROOT)/thirdparty/lcms2/include \
 	$(MY_ROOT)/thirdparty/mujs \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2 \
 	$(MY_ROOT)/thirdparty/zlib \
-	$(MY_ROOT)/thirdparty/freetype/include \
-	$(MY_ROOT)/scripts/freetype \
-	$(MY_ROOT)/scripts/libjpeg
 
 LOCAL_CFLAGS := \
-	-DFT2_BUILD_LIBRARY -DDARWIN_NO_CARBON -DHAVE_STDINT_H \
-	-DOPJ_HAVE_STDINT_H -DOPJ_HAVE_INTTYPES_H -DUSE_JPIP \
-	'-DFT_CONFIG_MODULES_H="slimftmodules.h"' \
-	'-DFT_CONFIG_OPTIONS_H="slimftoptions.h"' \
-	-Dhb_malloc_impl=hb_malloc -Dhb_calloc_impl=hb_calloc \
-	-Dhb_realloc_impl=hb_realloc -Dhb_free_impl=hb_free \
-	-DHAVE_OT -DHAVE_UCDN -DHB_NO_MT
+	-ffunction-sections -fdata-sections \
+	-DFT2_BUILD_LIBRARY -DDARWIN_NO_CARBON \
+	-DFT_CONFIG_MODULES_H="<slimftmodules.h>" \
+	-DFT_CONFIG_OPTIONS_H="<slimftoptions.h>" \
+	-DHAVE_STDINT_H \
+	-DOPJ_STATIC -DOPJ_HAVE_INTTYPES_H -DOPJ_HAVE_STDINT_H -DUSE_JPIP \
+
 ifdef NDK_PROFILER
 LOCAL_CFLAGS += -pg -DNDK_PROFILER -O2
 endif
@@ -31,17 +36,45 @@ ifdef MEMENTO
 LOCAL_CFLAGS += -DMEMENTO -DMEMENTO_LEAKONLY
 endif
 
-LOCAL_CPP_EXTENSION := .cc
+LOCAL_CPPFLAGS := \
+	-ffunction-sections -fdata-sections \
+	-fno-rtti -fno-exceptions -fvisibility-inlines-hidden --std=c++0x \
+	-DHAVE_OT -DHAVE_UCDN -DHB_NO_MT \
+	-Dhb_malloc_impl=fz_hb_malloc \
+	-Dhb_calloc_impl=fz_hb_calloc \
+	-Dhb_realloc_impl=fz_hb_realloc \
+	-Dhb_free_impl=fz_hb_free \
 
-
-MY_ROOT := mupdf
-
-LOCAL_MODULE := mupdfthirdparty
 LOCAL_SRC_FILES := \
-	$(MY_ROOT)/thirdparty/mujs/one.c \
+	$(MY_ROOT)/source/fitz/jmemcust.c \
+
+LOCAL_SRC_FILES += \
+	$(MY_ROOT)/thirdparty/freetype/src/base/ftbase.c \
+	$(MY_ROOT)/thirdparty/freetype/src/base/ftbbox.c \
+	$(MY_ROOT)/thirdparty/freetype/src/base/ftbitmap.c \
+	$(MY_ROOT)/thirdparty/freetype/src/base/ftfntfmt.c \
+	$(MY_ROOT)/thirdparty/freetype/src/base/ftgasp.c \
+	$(MY_ROOT)/thirdparty/freetype/src/base/ftglyph.c \
+	$(MY_ROOT)/thirdparty/freetype/src/base/ftinit.c \
+	$(MY_ROOT)/thirdparty/freetype/src/base/ftstroke.c \
+	$(MY_ROOT)/thirdparty/freetype/src/base/ftsynth.c \
+	$(MY_ROOT)/thirdparty/freetype/src/base/ftsystem.c \
+	$(MY_ROOT)/thirdparty/freetype/src/base/fttype1.c \
+	$(MY_ROOT)/thirdparty/freetype/src/cff/cff.c \
+	$(MY_ROOT)/thirdparty/freetype/src/cid/type1cid.c \
+	$(MY_ROOT)/thirdparty/freetype/src/psaux/psaux.c \
+	$(MY_ROOT)/thirdparty/freetype/src/pshinter/pshinter.c \
+	$(MY_ROOT)/thirdparty/freetype/src/psnames/psnames.c \
+	$(MY_ROOT)/thirdparty/freetype/src/raster/raster.c \
+	$(MY_ROOT)/thirdparty/freetype/src/sfnt/sfnt.c \
+	$(MY_ROOT)/thirdparty/freetype/src/smooth/smooth.c \
+	$(MY_ROOT)/thirdparty/freetype/src/truetype/truetype.c \
+	$(MY_ROOT)/thirdparty/freetype/src/type1/type1.c \
+
+LOCAL_SRC_FILES += \
 	$(MY_ROOT)/thirdparty/harfbuzz/src/hb-blob.cc \
-	$(MY_ROOT)/thirdparty/harfbuzz/src/hb-buffer.cc \
 	$(MY_ROOT)/thirdparty/harfbuzz/src/hb-buffer-serialize.cc \
+	$(MY_ROOT)/thirdparty/harfbuzz/src/hb-buffer.cc \
 	$(MY_ROOT)/thirdparty/harfbuzz/src/hb-common.cc \
 	$(MY_ROOT)/thirdparty/harfbuzz/src/hb-face.cc \
 	$(MY_ROOT)/thirdparty/harfbuzz/src/hb-fallback-shape.cc \
@@ -72,6 +105,8 @@ LOCAL_SRC_FILES := \
 	$(MY_ROOT)/thirdparty/harfbuzz/src/hb-ucdn.cc \
 	$(MY_ROOT)/thirdparty/harfbuzz/src/hb-unicode.cc \
 	$(MY_ROOT)/thirdparty/harfbuzz/src/hb-warning.cc \
+
+LOCAL_SRC_FILES += \
 	$(MY_ROOT)/thirdparty/jbig2dec/jbig2.c \
 	$(MY_ROOT)/thirdparty/jbig2dec/jbig2_arith.c \
 	$(MY_ROOT)/thirdparty/jbig2dec/jbig2_arith_iaid.c \
@@ -87,30 +122,8 @@ LOCAL_SRC_FILES := \
 	$(MY_ROOT)/thirdparty/jbig2dec/jbig2_segment.c \
 	$(MY_ROOT)/thirdparty/jbig2dec/jbig2_symbol_dict.c \
 	$(MY_ROOT)/thirdparty/jbig2dec/jbig2_text.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/bio.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/cidx_manager.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/cio.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/dwt.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/event.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/function_list.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/image.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/invert.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/j2k.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/jp2.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/mct.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/mqc.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/openjpeg.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/phix_manager.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/pi.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/ppix_manager.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/raw.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/t1.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/t2.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/tcd.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/tgt.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/thix_manager.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/thread.c \
-	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/tpix_manager.c \
+
+LOCAL_SRC_FILES += \
 	$(MY_ROOT)/thirdparty/libjpeg/jaricom.c \
 	$(MY_ROOT)/thirdparty/libjpeg/jcomapi.c \
 	$(MY_ROOT)/thirdparty/libjpeg/jdapimin.c \
@@ -141,6 +154,65 @@ LOCAL_SRC_FILES := \
 	$(MY_ROOT)/thirdparty/libjpeg/jquant1.c \
 	$(MY_ROOT)/thirdparty/libjpeg/jquant2.c \
 	$(MY_ROOT)/thirdparty/libjpeg/jutils.c \
+
+LOCAL_SRC_FILES += \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsalpha.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmscam02.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmscgats.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmscnvrt.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmserr.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsgamma.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsgmt.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmshalf.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsintrp.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsio0.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsio1.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmslut.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsmd5.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsmtrx.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsnamed.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsopt.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmspack.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmspcs.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsplugin.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsps2.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmssamp.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmssm.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmstypes.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsvirt.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmswtpnt.c \
+	$(MY_ROOT)/thirdparty/lcms2/src/cmsxform.c
+
+LOCAL_SRC_FILES += \
+	$(MY_ROOT)/thirdparty/mujs/one.c \
+
+LOCAL_SRC_FILES += \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/bio.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/cidx_manager.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/cio.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/dwt.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/event.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/function_list.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/image.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/invert.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/j2k.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/jp2.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/mct.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/mqc.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/openjpeg.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/phix_manager.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/pi.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/ppix_manager.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/raw.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/t1.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/t2.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/tcd.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/tgt.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/thix_manager.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/thread.c \
+	$(MY_ROOT)/thirdparty/openjpeg/src/lib/openjp2/tpix_manager.c \
+
+LOCAL_SRC_FILES += \
 	$(MY_ROOT)/thirdparty/zlib/adler32.c \
 	$(MY_ROOT)/thirdparty/zlib/compress.c \
 	$(MY_ROOT)/thirdparty/zlib/crc32.c \
@@ -151,32 +223,10 @@ LOCAL_SRC_FILES := \
 	$(MY_ROOT)/thirdparty/zlib/trees.c \
 	$(MY_ROOT)/thirdparty/zlib/uncompr.c \
 	$(MY_ROOT)/thirdparty/zlib/zutil.c \
-	$(MY_ROOT)/thirdparty/zlib/gzlib.c \
-	$(MY_ROOT)/thirdparty/zlib/gzwrite.c \
-	$(MY_ROOT)/thirdparty/zlib/gzclose.c \
-	$(MY_ROOT)/thirdparty/zlib/gzread.c \
-	$(MY_ROOT)/thirdparty/freetype/src/base/ftbase.c \
-	$(MY_ROOT)/thirdparty/freetype/src/base/ftbbox.c \
-	$(MY_ROOT)/thirdparty/freetype/src/base/ftbitmap.c \
-	$(MY_ROOT)/thirdparty/freetype/src/base/ftfntfmt.c \
-	$(MY_ROOT)/thirdparty/freetype/src/base/ftgasp.c \
-	$(MY_ROOT)/thirdparty/freetype/src/base/ftglyph.c \
-	$(MY_ROOT)/thirdparty/freetype/src/base/ftinit.c \
-	$(MY_ROOT)/thirdparty/freetype/src/base/ftstroke.c \
-	$(MY_ROOT)/thirdparty/freetype/src/base/ftsynth.c \
-	$(MY_ROOT)/thirdparty/freetype/src/base/ftsystem.c \
-	$(MY_ROOT)/thirdparty/freetype/src/base/fttype1.c \
-	$(MY_ROOT)/thirdparty/freetype/src/cff/cff.c \
-	$(MY_ROOT)/thirdparty/freetype/src/cid/type1cid.c \
-	$(MY_ROOT)/thirdparty/freetype/src/psaux/psaux.c \
-	$(MY_ROOT)/thirdparty/freetype/src/pshinter/pshinter.c \
-	$(MY_ROOT)/thirdparty/freetype/src/psnames/psnames.c \
-	$(MY_ROOT)/thirdparty/freetype/src/raster/raster.c \
-	$(MY_ROOT)/thirdparty/freetype/src/smooth/smooth.c \
-	$(MY_ROOT)/thirdparty/freetype/src/sfnt/sfnt.c \
-	$(MY_ROOT)/thirdparty/freetype/src/truetype/truetype.c \
-	$(MY_ROOT)/thirdparty/freetype/src/type1/type1.c
 
-#LOCAL_SRC_FILES := $(addprefix ../, $(LOCAL_SRC_FILES))
+LOCAL_SRC_FILES := \
+	$(subst $(LOCAL_PATH)/,, \
+		$(LOCAL_SRC_FILES) \
+	)
 
 include $(BUILD_STATIC_LIBRARY)

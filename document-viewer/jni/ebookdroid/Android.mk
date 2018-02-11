@@ -14,8 +14,6 @@ LOCAL_SRC_FILES := \
 	ebookdroidjni.c \
 	djvudroidbridge.cpp \
 	bytebufferbitmapbridge.c \
-	mupdfdroidbridge.c \
-	jni_concurrent.c \
 	PageCropper.c \
 	javahelpers.c
 
@@ -23,15 +21,12 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../mupdf/mupdf/include \
 	$(LOCAL_PATH)/../mupdf/mupdf/source/fitz \
 	$(LOCAL_PATH)/../mupdf/mupdf/source/pdf \
-	$(LOCAL_PATH)/../djvu/djvulibre/libdjvu
+	$(LOCAL_PATH)/../djvu/djvulibre/libdjvu \
 
 LOCAL_CXX_INCLUDES := \
-	$(LOCAL_PATH)/../djvu/djvulibre/libdjvu
+	$(LOCAL_PATH)/../djvu/djvulibre/libdjvu \
 
 LOCAL_STATIC_LIBRARIES := djvu mupdfcore mupdfthirdparty
-
-# uses Android log and z library (Android-3 Native API)
-LOCAL_LDLIBS := -llog -lz
 
 # Hack to work around "error: undefined reference to 'sigsetjmp'" link errors 
 # when linking x86 and mips libebookdroid.so with NDK r12b.
@@ -42,5 +37,8 @@ endif # TARGET_ARCH_ABI == x86
 ifeq ($(TARGET_ARCH_ABI),mips)
 	LOCAL_ALLOW_UNDEFINED_SYMBOLS := true
 endif # TARGET_ARCH_ABI == mips
+
+LOCAL_LDLIBS := -ljnigraphics -llog -lm -lz
+LOCAL_LDFLAGS := -Wl,--gc-sections
 
 include $(BUILD_SHARED_LIBRARY)
